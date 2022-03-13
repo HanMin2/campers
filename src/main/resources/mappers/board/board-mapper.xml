@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.campers.board.model.mapper.BoardMapper">
+
+	<resultMap type="FreeBoard" id="FreeBoardListResultMap">
+		<id property="no" column="FREE_NO"/>
+		<result property="writerId" column="G_USER_ID"/>
+		<result property="title" column="TITLE"/>
+		<result property="content" column="CONTENT"/>
+		<result property="originalFilename" column="ORIGINAL_FILENAME"/>
+		<result property="renameFilename" column="RENAME_FILENAME"/>
+		<result property="registDate" column="REGIST_DATE"/>
+		<result property="modifyDate" column="MODIFY_DATE"/>
+		<result property="readCount" column="READCOUNT"/>
+		<result property="status" column="STATUS"/>
+	</resultMap>
+		
+	<resultMap type="ReviewBoard" id="ReviewBoardListResultMap">
+		<id property="no" column="RPOST_NO"/>
+		<result property="writerId" column="G_USER_ID"/>
+		<result property="title" column="TITLE"/>
+		<result property="content" column="CONTENT"/>
+		<result property="originalFilename" column="ORIGINAL_FILENAME"/>
+		<result property="renameFilename" column="RENAME_FILENAME"/>
+		<result property="registDate" column="REGIST_DATE"/>
+		<result property="modifyDate" column="MODIFY_DATE"/>
+		<result property="readCount" column="READCOUNT"/>
+		<result property="status" column="STATUS"/>
+		<result property="mainImage" column="FIRST_IMAGE"/>
+		<result property="renameImage" column="RENAME_IMAGE"/>
+	</resultMap>
+	
+	<resultMap type="Reply" id="boardReplyListResultMap">
+		<id property="no" column="REPLY_NO"/>
+		<result property="content" column="CONTENT"/>
+		<result property="registDate" column="REGIST_DATE"/>
+		<result property="modifyDate" column="MODIFY_DATE"/>
+		<result property="boardNo" column="POST_NO"/>
+		<result property="writerId" column="G_USER_ID"/>
+		<result property="status" column="STATUS"/>
+	</resultMap>
+	 
+
+	<!-- Free Board -->
+	
+	<select id="selectFreeBoardList" resultMap="FreeBoardListResultMap" parameterType="map">
+		SELECT  FREE_NO,
+				G_USER_ID, 
+				TITLE, 
+				CONTENT, 
+				ORIGINAL_FILENAME, 
+				RENAME_FILENAME, 
+				REGIST_DATE,
+				MODIFY_DATE,
+				READCOUNT 
+		FROM FREE_POST
+		WHERE STATUS = 'Y'
+		<!-- WHERE 1=1 -->
+		<if test="writerKeyword != null">
+			AND G_USER_ID LIKE '%'||#{writerKeyword}||'%' 
+		</if>
+		<if test="titleKeyword != null">
+			AND TITLE LIKE '%'||#{titleKeyword}||'%' 
+		</if>
+		<if test="contentKeyword != null">
+			AND CONTENT LIKE '%' || #{contentKeyword} || '%' 
+		</if>
+		ORDER BY REGIST_DATE DESC
+	</select>
+		
+	<select id="selectFreeBoardCount" resultType="_int" parameterType="map">
+		SELECT  COUNT(*)
+		FROM FREE_POST
+		WHERE STATUS = 'Y'-->
+		<!-- WHERE 1=1 -->
+		<if test="writerKeyword != null">
+			AND G_USER_ID LIKE '%' || #{writerKeyword} || '%' 
+		</if>
+		<if test="titleKeyword != null">
+			AND TITLE LIKE '%' || #{titleKeyword} || '%' 
+		</if>
+		<if test="contentKeyword != null">
+			AND CONTENT LIKE '%' || #{contentKeyword} || '%' 
+		</if>
+	</select>
+	
+	<select id="selectFreeBoardByNo" parameterType="string" resultMap="FreeBoardListResultMap">
+ 		SELECT FREE_NO,
+		       G_USER_ID,
+		       TITLE, 
+		       CONTENT, 
+		       ORIGINAL_FILENAME, 
+		       RENAME_FILENAME, 
+		       REGIST_DATE,
+		       MODIFY_DATE,
+		       READCOUNT, 
+		       STATUS
+		FROM FREE_POST
+		WHERE STATUS='Y' AND FREE_NO=#{ no }
+	</select>
+	
+	<update id="updateReadCountFreeBoard" parameterType="map">
+		UPDATE FREE_POST SET READCOUNT=#{readCount} WHERE FREE_NO=#{no}
+	</update>
+	
+	<insert id="insertFreeBoard" parameterType="map"
+			useGeneratedKeys="true" keyProperty="no" keyColumn="FREE_NO">
+		INSERT INTO FREE_POST (
+			FREE_NO,
+		    G_USER_ID,
+		    TITLE, 
+		    CONTENT, 
+		    ORIGINAL_FILENAME, 
+		    RENAME_FILENAME, 
+		    REGIST_DATE,
+		    MODIFY_DATE,
+		    READCOUNT, 
+		    STATUS
+		) VALUES (
+			'FP'||SEQ_FREE_NO.NEXTVAL,
+			#{writerId},
+			#{title},
+			#{content},
+			#{originalFilename},
+			#{renameFilename},
+			DEFAULT,
+			DEFAULT,
+			DEFAULT,
+			DEFAULT
+		)
+	</insert>
+	
+	<update id="updateFreeBoard" parameterType="map">
+		UPDATE FREE_POST
+		SET
+			TITLE=#{title},
+			CONTENT=#{content},
+			<if test="originalFilename != null">
+				ORIGINAL_FILENAME=#{originalFilename},
+			</if>
+			<if test="renameFilename != null">
+				RENAME_FILENAME=#{renameFilename},
+			</if>
+			MODIFY_DATE=SYSDATE
+		WHERE
+			FREE_NO=#{no}
+	</update>
+	
+	
+	<update id="deleteFreeBoard" parameterType="string">
+		UPDATE FREE_POST SET STATUS='N' WHERE FREE_NO=#{no}
+	</update>
+	
+	<select id="selectFreeCountById" parameterType="string" resultType="_int">
+		SELECT  COUNT(*)
+		FROM FREE_POST
+		WHERE G_USER_ID = #{writerId}
+			AND STATUS = 'Y'
+	</select>
+	
+	<select id="selectFreeById" parameterType="string" resultMap="FreeBoardListResultMap">
+		SELECT  FREE_NO,
+		   		G_USER_ID,
+		    	TITLE, 
+		    	CONTENT, 
+		    	ORIGINAL_FILENAME, 
+		    	RENAME_FILENAME, 
+		    	REGIST_DATE,
+		    	MODIFY_DATE,
+		    	READCOUNT, 
+		    	STATUS
+		FROM FREE_POST
+		WHERE G_USER_ID = #{writerId}
+			AND STATUS = 'Y'
+		ORDER BY REGIST_DATE DESC
+		
+	</select>
+	
+	
+	<!-- Review Board -->
+	
+	<select id="selectReviewBoardList" resultMap="ReviewBoardListResultMap" parameterType="map">
+		SELECT  RPOST_NO,
+				G_USER_ID, 
+				TITLE, 
+				CONTENT, 
+				ORIGINAL_FILENAME, 
+				RENAME_FILENAME, 
+				REGIST_DATE,
+				MODIFY_DATE,
+				READCOUNT,
+				FIRST_IMAGE,
+				RENAME_IMAGE 
+		FROM REVIEW_POST
+		WHERE STATUS = 'Y'
+		<!-- WHERE 1=1 -->
+		<if test="writerKeyword != null">
+			AND G_USER_ID LIKE '%'||#{writerKeyword}||'%' 
+		</if>
+		<if test="titleKeyword != null">
+			AND TITLE LIKE '%'||#{titleKeyword}||'%' 
+		</if>
+		<if test="contentKeyword != null">
+			AND CONTENT LIKE '%' || #{contentKeyword} || '%' 
+		</if>
+		ORDER BY REGIST_DATE DESC
+	</select>
+		
+	<select id="selectReviewBoardCount" resultType="_int" parameterType="map">
+		SELECT  COUNT(*)
+		FROM REVIEW_POST
+		WHERE STATUS = 'Y'-->
+		<!-- WHERE 1=1 -->
+		<if test="writerKeyword != null">
+			AND G_USER_ID LIKE '%' || #{writerKeyword} || '%' 
+		</if>
+		<if test="titleKeyword != null">
+			AND TITLE LIKE '%' || #{titleKeyword} || '%' 
+		</if>
+		<if test="contentKeyword != null">
+			AND CONTENT LIKE '%' || #{contentKeyword} || '%' 
+		</if>
+	</select>
+	
+	<select id="selectReviewBoardByNo" parameterType="string" resultMap="ReviewBoardListResultMap">
+ 		SELECT RPOST_NO,
+		       G_USER_ID,
+		       TITLE, 
+		       CONTENT, 
+		       ORIGINAL_FILENAME, 
+		       RENAME_FILENAME, 
+		       REGIST_DATE,
+		       MODIFY_DATE,
+		       READCOUNT, 
+		       FIRST_IMAGE,
+		       RENAME_IMAGE 
+		FROM REVIEW_POST
+		WHERE STATUS='Y' AND RPOST_NO=#{ no }
+	</select>
+	
+	<update id="updateReadCountReviewBoard" parameterType="map">
+		UPDATE REVIEW_POST SET READCOUNT=#{readCount} WHERE RPOST_NO=#{no}
+	</update>
+	
+	
+	<insert id="insertReviewBoard" parameterType="map"
+			useGeneratedKeys="true" keyProperty="no" keyColumn="RPOST_NO">
+		INSERT INTO REVIEW_POST (
+			RPOST_NO,
+		    G_USER_ID,
+		    TITLE, 
+		    CONTENT, 
+		    ORIGINAL_FILENAME, 
+		    RENAME_FILENAME, 
+		    REGIST_DATE,
+		    MODIFY_DATE,
+		    READCOUNT, 
+		    STATUS,
+		    FIRST_IMAGE,
+		    RENAME_IMAGE
+		) VALUES (
+			'RP'||SEQ_REVIEW_NO.NEXTVAL,
+			#{writerId},
+			#{title},
+			#{content},
+			#{originalFilename},
+			#{renameFilename},
+			DEFAULT,
+			DEFAULT,
+			DEFAULT,
+			DEFAULT,
+			#{mainImage},
+			#{renameImage}
+		)
+	</insert>
+	
+	<update id="updateReviewBoard" parameterType="map">
+		UPDATE REVIEW_POST
+		SET
+			TITLE=#{title},
+			CONTENT=#{content},
+			<if test="originalFilename != null">
+				ORIGINAL_FILENAME=#{originalFilename},
+			</if>
+			<if test="renameFilename != null">
+				RENAME_FILENAME=#{renameFilename},
+			</if>
+			MODIFY_DATE=SYSDATE
+		WHERE
+			RPOST_NO=#{no}
+	</update>
+	
+	
+	<update id="deleteReviewBoard" parameterType="string">
+		UPDATE REVIEW_POST SET STATUS='N' WHERE RPOST_NO=#{no}
+	</update>
+	
+	
+	<select id="selectReviewCountById" parameterType="string" resultType="_int">
+		SELECT  COUNT(*)
+		FROM REVIEW_POST
+		WHERE G_USER_ID = #{writerId}
+			AND STATUS = 'Y'
+	</select>
+	
+	
+	<select id="selectReviewById" parameterType="string" resultMap="ReviewBoardListResultMap">
+		SELECT RPOST_NO,
+		       G_USER_ID,
+		       TITLE, 
+		       CONTENT, 
+		       ORIGINAL_FILENAME, 
+		       RENAME_FILENAME, 
+		       REGIST_DATE,
+		       MODIFY_DATE,
+		       READCOUNT, 
+		       FIRST_IMAGE,
+		       RENAME_IMAGE 
+		FROM REVIEW_POST
+		WHERE G_USER_ID = #{writerId}
+			AND STATUS = 'Y'
+		ORDER BY REGIST_DATE DESC
+			
+	</select>
+	
+	  
+	<!-- Reply -->
+	  
+	<select id="selectReplyListByNo" parameterType="string" resultMap="boardReplyListResultMap">
+ 		SELECT REPLY_NO,
+		       CONTENT,
+		       REGIST_DATE, 
+		       MODIFY_DATE, 
+		       POST_NO, 
+		       G_USER_ID, 
+		       STATUS
+		FROM REPLY
+		WHERE STATUS='Y' AND POST_NO=#{ boardNo }
+	</select>
+	
+	
+	
+	<insert id="insertReply" parameterType="map">
+		INSERT INTO REPLY (
+			REPLY_NO,
+			CONTENT,
+			REGIST_DATE,
+			MODIFY_DATE,
+			POST_NO,
+			G_USER_ID,
+			STATUS
+		)   VALUES(
+			'REPLY'||SEQ_REPLY_NO.NEXTVAL, 
+			#{content}, 
+			DEFAULT, 
+			DEFAULT, 
+			#{boardNo}, 
+			#{writerId}, 
+			DEFAULT
+		)
+	</insert>
+	
+	<delete id="deleteReply" parameterType="string">
+		DELETE REPLY WHERE REPLY_NO=#{no}
+	</delete>
+	
+	
+	<select id="selectReplyCountById" parameterType="string" resultType="_int">
+		SELECT  COUNT(*)
+		FROM REPLY
+		WHERE G_USER_ID = #{writerId}
+	</select>
+</mapper>

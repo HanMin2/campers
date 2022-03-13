@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.campers.inquiry.model.mapper.InquiryMapper">
+	<sql id="selectInquirySql">
+ 		SELECT  INQUIRY_NO, 
+			    SENDER,
+			    SENDER_NAME, 
+			    RECEIVER, 
+			    RECEIVER_NAME,
+			    REGIST_DATE,
+			    CONTENT
+		FROM INQUIRY
+ 	</sql>
+ 
+ 	<resultMap type="Inquiry" id="inquiryResultMap">
+ 		<id property="no" column="INQUIRY_NO"/>
+ 		<result property="sender" column="SENDER" />
+ 		<result property="senderName" column="SENDER_NAME" />
+ 		<result property="receiver" column="RECEIVER"/>
+ 		<result property="receiverName" column="RECEIVER_NAME" />
+ 		<result property="registDate" column="REGIST_DATE"/>
+ 		<result property="content" column="CONTENT"/>
+ 	</resultMap>
+ 
+ 	<select id="selectAll" resultMap="inquiryResultMap">
+ 		<include refid="selectInquirySql" />
+ 	</select>
+ 	
+ 	<!-- 송신자별 문의 내역 리스트 -->
+ 	<select id="selectInquiryByUser" resultMap="inquiryResultMap" parameterType="string">
+ 		<include refid="selectInquirySql" />
+ 		WHERE SENDER LIKE #{sender}
+ 		ORDER BY REGIST_DATE DESC
+ 	</select>
+ 	
+ 	<!-- 송신자-수신자 문의 내역 -->
+ 	<select id="selectInquiryDetail" resultMap="inquiryResultMap" parameterType="map">
+ 		<include refid="selectInquirySql" />
+ 		WHERE (SENDER LIKE #{sender} AND RECEIVER LIKE #{receiver}) 
+ 			OR (SENDER LIKE #{receiver} AND RECEIVER LIKE #{sender})
+ 		ORDER BY REGIST_DATE ASC
+ 	</select>
+ 	
+ 	<insert id="insertInquiryDetail" parameterType="map"
+ 	useGeneratedKeys="true" keyProperty="no" keyColumn="INQUIRY_NO">
+ 		INSERT INTO INQUIRY(
+ 			INQUIRY_NO, 
+			SENDER,
+			SENDER_NAME, 
+			RECEIVER, 
+			RECEIVER_NAME,
+			REGIST_DATE,
+			CONTENT
+ 		) VALUES (
+ 			'INQUIRY'||SEQ_INQUIRY_NO.NEXTVAL,
+ 			#{sender},
+ 			#{senderName},
+ 			#{receiver},
+ 			#{receiverName},
+ 			DEFAULT,
+ 			#{content}
+ 		)
+ 	</insert>
+</mapper>

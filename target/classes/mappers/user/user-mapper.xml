@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Mapper 설정 파일임을 선언하는 부분 -->
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="com.campers.user.model.mapper.UserMapper">
+ 	<sql id="selectUserSql">
+ 		SELECT  ID, 
+			    PASSWORD, 
+			    NAME, 
+			    TEL, 
+			    EMAIL, 
+			    ADDRESS
+		FROM G_USER
+ 	</sql>
+
+ 	<resultMap type="User" id="UserResultMap">
+ 		<id property="userId" column="ID" />
+ 		<result property="userPwd" column="PASSWORD"/>
+ 		<result property="name" column="NAME"/>
+ 		<result property="tel" column="TEL"/>
+ 		<result property="email" column="EMAIL"/>
+ 		<result property="address" column="ADDRESS"/>
+ 	</resultMap>
+ 
+ 	<select id="selectCount" resultType="_int">
+ 		SELECT COUNT(*) FROM G_USER
+ 	</select>
+ 	
+ 	<select id="selectAll" resultMap="UserResultMap">
+ 		<include refid="selectUserSql" />
+ 	</select>
+ 	
+ 	<select id="selectUser" parameterType="string" resultMap="UserResultMap">
+ 		<include refid="selectUserSql" />
+		WHERE ID = #{userId}
+ 	</select>
+ 	
+ 	
+ 	<insert id="insertUser" parameterType="User"
+ 		useGeneratedKeys="true" keyColumn="ID" keyProperty="userId" >
+	 	INSERT INTO G_USER (
+		    ID, 
+		    PASSWORD, 
+		    NAME,
+		    TEL, 
+		    EMAIL, 
+		    ADDRESS
+		) VALUES(
+		    #{userId},
+		    #{userPwd},
+		    #{name},
+		    #{tel},
+		    #{email},
+		    #{address}
+		) 	
+ 	</insert>
+ 	
+ 	<update id="updateUser" parameterType="map">
+ 		UPDATE G_USER 
+ 		SET 
+ 			NAME = #{name},
+ 			TEL = #{phone},
+ 			EMAIL = #{email},
+ 			ADDRESS = #{address}
+		WHERE 
+ 			ID=#{userId}
+		
+ 	</update>
+ 	
+ 	<update id="updatePwd" parameterType="map">
+	 	UPDATE G_USER SET PASSWORD=#{newPwd} WHERE ID=#{userId}
+ 	</update>
+ 	
+ 	<!-- 
+ 	<update id="deleteUser" parameterType="string">
+ 		UPDATE G_USER
+ 		SET
+ 			STATUS='N'
+ 		WHERE 
+ 			ID=#{userId}
+ 	</update>
+ 	 -->
+ 	
+ </mapper>

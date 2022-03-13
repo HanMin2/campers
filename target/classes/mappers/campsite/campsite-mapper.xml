@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace = "com.campers.campsite.model.mapper.CampsiteMapper">
+
+	<resultMap type="Campsite" id = "campsiteMap">
+		<result property = "campsite_index" column="campsite_index" />
+		<result property = "campsite_name" column="campsite_name" />
+		<result property = "line_intro" column="line_intro" />
+		<result property = "allar" column="allar" />
+		<result property = "insurance" column="insurance" />
+		<result property = "business_no" column="business_no" />
+		<result property = "induty" column="induty" />
+		<result property = "lct_cl" column="lct_cl" />
+		<result property = "do_name" column="do_name" />
+		<result property = "sigungu_name" column="sigungu_name" />
+		<result property = "zipcode" column="zipcode" />
+		<result property = "addr1" column="addr1" />
+		<result property = "addr2" column="addr2" />
+		<result property = "map_x" column="map_x" />
+		<result property = "map_y" column="map_y" />
+		<result property = "direction" column="direction" />
+		<result property = "tel" column="tel" />
+		<result property = "homepage" column="homepage" />
+		<result property = "manager" column="manager" />
+		<result property = "gnrlsite" column="gnrlsite" />
+		<result property = "autosite" column="autosite" />
+		<result property = "glampsite" column="glampsite" />
+		<result property = "caravsite" column="caravsite" />
+		<result property = "indivi_caravsite" column="indivi_caravsite" />
+		<result property = "oper_pd" column="oper_pd" />
+		<result property = "oper_de" column="oper_de" />
+		<result property = "toilet" column="toilet" />
+		<result property = "shower" column="shower" />
+		<result property = "sink" column="sink" />
+		<result property = "brazier" column="brazier" />
+		<result property = "sbrs" column="sbrs" />
+		<result property = "exprn_progrm_at" column="exprn_progrm_at" />
+		<result property = "exprn_progrm" column="exprn_progrm" />
+		<result property = "extshr" column="extshr" />
+		<result property = "firewater" column="firewater" />
+		<result property = "firesand" column="firesand" />
+		<result property = "firesensor" column="firesensor" />
+		<result property = "thema" column="thema" />
+		<result property = "eqpmn_lend" column="eqpmn_lend" />
+		<result property = "animal" column="animal" />
+		<result property = "tour_era" column="tour_era" />
+		<result property = "first_image" column="first_image" />
+		<result property = "create_time" column="create_time" />
+		<result property = "cost" column ="cost" />
+		<result property = "id" column ="id" />
+		<result property = "password" column ="password" />
+	</resultMap>
+	
+
+    <resultMap type="Review" id="ReviewListResultMap">
+		<id property="no" column="NO"/>
+		<result property="id" column="ID"/>
+		<result property="index" column="CAMPSITE_INDEX"/>
+		<result property="campsiteName" column="CAMPSITE_NAME"/>
+		<result property="content" column="CONTENT"/>
+		<result property="registDate" column="REGIST_DATE"/>
+	</resultMap>
+
+	<!-- 체크박스로 받는 정보가 있는경우 구문 후단에 typeHandler 추가 -->
+	<!-- ex)<result property = "thema" column="thema" typeHandler = "campsiteHandler">/> -->
+
+	<insert id="insertCampsite" parameterType="Campsite">
+		INSERT INTO CAMPSITE VALUES(
+			#{campsite_index}, #{campsite_name}, #{line_intro}, #{allar},
+			#{insurance}, #{business_no}, #{induty}, #{lct_cl}, #{do_name},
+			#{sigungu_name}, #{zipcode}, #{addr1}, #{addr2}, #{map_x}, #{map_y},
+			#{direction}, #{tel}, #{homepage}, #{manager}, #{gnrlsite}, #{autosite},
+			#{glampsite}, #{caravsite}, #{indivi_caravsite}, #{oper_pd}, #{oper_de},
+			#{toilet}, #{shower}, #{sink}, #{brazier}, #{sbrs}, #{exprn_progrm_at},
+			#{exprn_progrm}, #{extshr}, #{firewater}, #{firesand}, #{firesensor}, 
+			#{thema}, #{eqpmn_lend}, #{animal}, #{tour_era}, #{first_image}, #{create_time},#{cost},
+			 #{id}, #{password}
+		)
+	</insert>
+ 
+	<select id="getCampsiteList" resultType="Campsite" parameterType="map">
+		SELECT  
+		first_image,
+		campsite_index,
+        campsite_name,
+        line_intro,
+        do_name,
+        sigungu_name,
+        addr1,
+        cost,
+        gnrlsite,
+        autosite,
+        glampsite,
+        caravsite,
+        map_x,
+        map_y
+		FROM CAMPSITE where 1=1 
+
+		<!-- WHERE 1=1 -->
+
+		<if test="searchLoc != null">
+			AND ADDR1 LIKE #{searchLoc} || '%'
+		</if>
+ 		<if test='searchType == "전체"'>
+			AND  gnrlsite >= 0
+		</if>
+ 		<if test='searchType == "캠핑"'>
+			AND  gnrlsite >= 1
+		</if>
+ 		<if test='searchType == "오토캠핑"'>
+			AND  autosite >= 1
+		</if>
+ 		<if test='searchType == "글램핑"'>
+			AND  glampsite >= 1
+		</if>
+ 		<if test='searchType == "카라반"'>
+			AND  caravsite >= 1
+		</if>
+		<if test="campsite_name != null">
+			AND CAMPSITE_NAME LIKE '%' || #{campsite_name} || '%' 
+		</if>
+	</select>
+	
+	
+	<select id="getCampsiteCount" resultType="int" parameterType="map">
+		SELECT  COUNT(*)
+		FROM CAMPSITE where 1=1 
+
+		<!-- WHERE 1=1 -->
+
+		<if test="searchLoc != null">
+			AND ADDR1 LIKE #{searchLoc} || '%'
+		</if>
+ 		<if test='searchType == "전체"'>
+			AND  gnrlsite >= 0
+		</if>
+ 		<if test='searchType == "캠핑"'>
+			AND  gnrlsite >= 1
+		</if>
+ 		<if test='searchType == "오토캠핑"'>
+			AND  autosite >= 1
+		</if>
+ 		<if test='searchType == "글램핑"'>
+			AND  glampsite >= 1
+		</if>
+ 		<if test='searchType == "카라반"'>
+			AND  caravsite >= 1
+		</if>
+		<if test="campsite_name != null">
+			AND CAMPSITE_NAME LIKE '%' || #{campsite_name} || '%' 
+		</if>
+	</select>
+	<select id="getCampsiteCount2" resultType="int" parameterType="CampsiteBean">
+		SELECT COUNT(*)
+		FROM CAMPSITE
+		WHERE
+		DO_NAME = #{location}
+		AND (COST BETWEEN
+		#{pricefrom} AND #{priceto})
+		AND (INDUTY LIKE '%' || #{searchSite} || '%')
+		<if test="neighbourhood != null">
+			AND (sigungu_name = #{neighbourhood})
+		</if>
+		<if test="type != null">
+			AND (
+			<foreach collection="type" item="item" separator="or">
+				lct_cl LIKE '%' || #{item} || '%'
+			</foreach>
+			)
+		</if>
+		<if test="amenities != null">
+			AND (
+			<foreach collection="amenities" item="item" separator="or">
+				sbrs LIKE '%' || #{item} || '%'
+			</foreach>
+			)
+		</if>
+		<if test="facilities != null">
+			AND (
+			<foreach collection="facilities" item="item" separator="or">
+				thema LIKE '%' || #{item} || '%'
+			</foreach>
+			)
+		</if>
+	</select>
+
+	
+	<select id="getCampsiteList2" resultMap="campsiteMap" parameterType="CampsiteBean">
+		SELECT *
+		FROM CAMPSITE
+		WHERE
+		DO_NAME = #{location}
+		AND (COST BETWEEN
+		#{pricefrom} AND #{priceto})
+		AND (INDUTY LIKE '%' || #{searchSite} || '%')
+		<if test="neighbourhood != null">
+			AND (sigungu_name = #{neighbourhood})
+		</if>
+		<if test="type != null">
+			AND (
+			<foreach collection="type" item="item" separator="or">
+				lct_cl LIKE '%' || #{item} || '%'
+			</foreach>
+			)
+		</if>
+		<if test="amenities != null">
+			AND (
+			<foreach collection="amenities" item="item" separator="or">
+				sbrs LIKE '%' || #{item} || '%'
+			</foreach>
+			)
+		</if>
+		<if test="facilities != null">
+			AND (
+			<foreach collection="facilities" item="item" separator="or">
+				thema LIKE '%' || #{item} || '%'
+			</foreach>
+			)
+		</if>
+		
+	</select>
+	
+	<insert id="insertCampsiteUser" parameterType="Campsite">
+		INSERT INTO CAMPSITE VALUES(
+			SEQ_CAMSITE_INDEX.NEXTVAL, '', '', '',
+			'', '', '', '', '',
+			'', '', '', '', '', '',
+			'', '', '', '', '', '',
+			'', '', '', '', '',
+			'', '', '', '', '', '',
+			'', '', '', '', '', 
+			'', '', '', '', '', '', '',
+			 #{id}, #{password}
+		)
+	</insert>
+	
+	<select id="selectCampsiteById" resultType="Campsite" parameterType="string">
+		SELECT *
+		FROM CAMPSITE
+		WHERE id = #{id}	
+	</select>
+	
+	<select id="getCampsiteList3" resultType="Campsite" parameterType="string">
+		SELECT *
+		FROM CAMPSITE
+		WHERE do_name = #{do_name}	
+	</select>
+	
+	
+	<select id="selectCampsiteByIndex" resultType="Campsite" parameterType="string">
+		SELECT *
+		FROM CAMPSITE
+		WHERE campsite_index = #{campsite_index}	
+	</select>
+	
+	<select id="selectCampsiteListById" resultMap="campsiteMap" parameterType="string">
+		SELECT *
+		FROM CAMPSITE
+		WHERE id = #{id}	
+	</select>
+	
+	<update id="updateCampsiteStep1" parameterType="map">
+		UPDATE CAMPSITE
+		SET 
+		campsite_name = #{campsite_name}, 
+		tel = #{tel}, 
+		cost = #{cost}, 
+		induty=#{induty}, 
+		gnrlsite=#{gnrlsite},
+		glampsite=#{glampsite},
+		autosite=#{autosite},
+		caravsite=#{caravsite},
+		business_no=#{buisiness_no},
+		lct_cl=#{lct_cl},
+		oper_pd=#{oper_pd},
+		insurance = #{insurance},
+		allar = #{allar},
+		oper_de = #{oper_de},
+		do_name = #{do_name},
+		sigungu_name = #{sigungu_name},
+		addr1 = #{addr1},
+		addr2 = #{addr2},
+		zipcode=#{zipcode},
+		direction=#{direction}
+		WHERE
+		id = #{campsite_id}
+	</update>
+	
+	<update id="updateCampsiteStep2" parameterType="map">
+		UPDATE CAMPSITE
+		SET
+		line_intro = #{line_intro},
+		first_image = #{first_img}
+		WHERE
+		id = #{campsite_id}
+	</update>
+	
+	<update id="updateCampsiteStep3" parameterType="map">
+		UPDATE CAMPSITE
+		SET
+		manager = #{manager},
+		toilet = #{toilet},
+		sink = #{sink},
+		extshr = #{extshr},
+		firewater = #{firewater},
+		firesand = #{firesand},
+		firesensor = #{firesensor},
+		brazier = #{brazier},
+		animal = #{animal},
+		sbrs = #{sbrs}
+		WHERE
+		id = #{campsite_id}
+	</update>
+	
+	
+	<update id="updateCampsiteStep4" parameterType="map">
+		UPDATE CAMPSITE
+		SET
+		tour_era = #{tour_era},
+		thema = #{thema},
+		eqpmn_lend = #{eqpmn_lend},
+		homepage = #{homepage},
+		exprn_progrm = #{exprn_progrm}
+		WHERE
+		id = #{campsite_id}
+	</update>
+
+	
+	<!-- Review -->
+	  
+	<select id="selectReviewByIndex" parameterType="string" resultMap="ReviewListResultMap">
+ 		SELECT *
+		FROM REVIEW
+		WHERE CAMPSITE_INDEX=#{ index }
+	</select>
+	
+	<select id="selectReviewById" parameterType="string" resultMap="ReviewListResultMap">
+ 		SELECT *
+		FROM REVIEW
+		WHERE ID=#{ id }
+	</select>
+	
+	<insert id="insertReview" parameterType="map"
+			useGeneratedKeys="true" keyProperty="no" keyColumn="NO" >
+		INSERT INTO REVIEW (
+			NO,
+			ID,
+			CAMPSITE_INDEX,
+			CAMPSITE_NAME,
+			CONTENT,
+			REGIST_DATE
+		) VALUES(
+			'REVIEW'||SEQ_R_NO.NEXTVAL, 
+			#{id}, 
+			#{index}, 
+			#{campsiteName}, 
+			#{content}, 
+			DEFAULT
+		)
+	</insert>
+	
+	<select id="selectReviewCountById" parameterType="string" resultType="_int">
+		SELECT  COUNT(*)
+		FROM REVIEW
+		WHERE ID = #{id}
+	</select>
+	
+	<select id="selectReviewCountByIndex" parameterType="string" resultType="_int">
+		SELECT  COUNT(*)
+		FROM REVIEW
+		WHERE CAMPSITE_INDEX = #{index}
+	</select>
+</mapper>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Mapper 설정 파일임을 선언하는 부분 -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.campers.reservation.model.mapper.ReservationMapper">
+	<sql id="selectReservationSql">
+ 		SELECT  RESERVATION_NO, 
+			    PAY, 
+			    HEADCOUNT, 
+			    CHECKIN,
+			    CHECKOUT, 
+			    G_USER_ID, 
+			    CAMPITE_INDEX
+		FROM RESERVATION
+ 	</sql>
+ 
+ 	<resultMap type="Reservation" id="reservationResultMap">
+ 		<id property="reservNo" column="RESERVATION_NO"/>
+ 		<result property="totalCost2" column="PAY" />
+ 		<result property="headCount" column="HEADCOUNT"/>
+ 		<result property="startdate" column="CHECKIN"/>
+ 		<result property="enddate" column="CHECKOUT"/>
+ 		<result property="userid" column="G_USER_ID"/>
+ 		<result property="campsite_index" column="CAMPSITE_INDEX"/>
+ 	</resultMap>
+ 
+ 	<select id="selectAll" resultMap="reservationResultMap">
+ 		<include refid="selectReservationSql" />
+ 	</select>
+ 	
+ 	<insert id="insertReservation" parameterType="Reservation">
+ 		INSERT INTO RESERVATION(
+			RESERVATION_NO, 
+		    PAY, 
+		    HEADCOUNT, 
+		    CHECKIN,
+		    CHECKOUT, 
+		    G_USER_ID, 
+		    CAMPSITE_INDEX
+		    ) VALUES(
+		    SEQ_RESERV_NO.NEXTVAL, <!--예약번호 -->
+		   	#{totalCost2},
+		   	#{headCount},
+		   	TO_DATE(REPLACE(#{startdate},' ',''),'YYYY-MM-DD'), <!--체크인 날짜 #{bookingdate} -->
+		    TO_DATE(REPLACE(#{enddate},' ',''),'YYYY-MM-DD'), <!--체크아웃 날짜  #{bookingdate}-->
+		   	#{userid}, <!--유저 아이디  #{loginuser}-->
+		   	#{campsite_index} <!--캠핑장 인덱스 #{campsite_index} -->
+ 		)
+ 	
+ 	</insert>
+ 	
+ 	<select id="selectReservationByNo" parameterType="string" resultMap="reservationResultMap">
+ 		<include refid="selectReservationSql" />
+ 		WHERE ID = #{reservation_no}
+ 	</select>
+ 	
+ 	<select id="selectReservationListByUserId" parameterType="string" resultMap="reservationResultMap">
+ 		SELECT *
+ 		FROM RESERVATION
+ 		WHERE G_USER_ID = #{userid}
+ 	</select>
+ 	
+ 	<select id="selectReservationCount" resultType="_int" parameterType="string">
+ 		SELECT COUNT(*)
+ 		FROM RESERVATION
+ 		WHERE G_USER_ID = #{userid}
+ 	
+ 	</select>
+ 	
+ 	<select id="selectReservationCampsiteCount" resultType="_int" parameterType="string">
+ 		SELECT COUNT(*)
+ 		FROM RESERVATION
+ 		WHERE CAMPSITE_INDEX = #{campsite_index}
+ 	</select>
+ 	
+ 	<select id="selectReservationCampsiteList" parameterType="string" resultMap="reservationResultMap">
+ 		SELECT *
+ 		FROM RESERVATION
+ 		WHERE CAMPSITE_INDEX = #{campsite_index}
+ 	</select>
+ 	
+ 	
+
+ 	
+</mapper>
